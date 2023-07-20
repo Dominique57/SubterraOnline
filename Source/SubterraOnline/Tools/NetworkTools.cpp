@@ -2,25 +2,26 @@
 
 
 #include "NetworkTools.h"
+#include "OnlineSubsystemUtils.h"
 #include "OnlineSubsystem.h"
 
-IOnlineSubsystem* UNetworkTools::GetSessionInterface()
+IOnlineSubsystem* UNetworkTools::GetSessionInterface(UObject* World)
 {
-	auto* OnlineSubsystem = IOnlineSubsystem::Get();
+	auto* OnlineSubsystem = Online::GetSubsystem(GEngine->GetWorldFromContextObject(World, EGetWorldErrorMode::ReturnNull));
 	check(OnlineSubsystem);
 	return OnlineSubsystem;
 }
 
-IOnlineSessionPtr UNetworkTools::GetSessionManager()
+IOnlineSessionPtr UNetworkTools::GetSessionManager(UObject* World)
 {
-	const auto SessionManager = GetSessionInterface()->GetSessionInterface();
+	const auto SessionManager = GetSessionInterface(World)->GetSessionInterface();
 	check(SessionManager.Get());
 	return SessionManager;
 }
 
-FNamedOnlineSession* UNetworkTools::GetDefaultSession()
+FNamedOnlineSession* UNetworkTools::GetDefaultSession(UObject* World)
 {
-	auto* Session = GetSessionManager()->GetNamedSession(EName::GameSession);
+	auto* Session = GetSessionManager(World)->GetNamedSession(EName::GameSession);
 	return Session;
 }
 
@@ -29,24 +30,24 @@ FName UNetworkTools::GetDefaultSessionName()
 	return EName::GameSession;
 }
 
-bool UNetworkTools::IsSessionValid(FName SessionName)
+bool UNetworkTools::IsSessionValid(UObject* WorldContext, FName SessionName)
 {
-	const auto* Session = GetSessionManager()->GetNamedSession(SessionName);
+	const auto* Session = GetSessionManager(WorldContext)->GetNamedSession(SessionName);
 	return Session != nullptr;
 }
 
-FString UNetworkTools::GetSessionConnectionString(FName SessionName)
+FString UNetworkTools::GetSessionConnectionString(UObject* WorldContext, FName SessionName)
 {
-	const auto SessionManager = GetSessionManager();
+	const auto SessionManager = GetSessionManager(WorldContext);
 	FString ConnectInfo;
 	if (SessionManager->GetResolvedConnectString(SessionName, ConnectInfo))
 		return ConnectInfo;
 	return FString();
 }
 
-int UNetworkTools::GetSessionsNum()
+int UNetworkTools::GetSessionsNum(UObject* WorldContext)
 {
-	const auto SessionManager = GetSessionManager();
+	const auto SessionManager = GetSessionManager(WorldContext);
 	return SessionManager->GetNumSessions();
 }
 
