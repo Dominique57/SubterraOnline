@@ -7,7 +7,8 @@
 
 IOnlineSubsystem* UNetworkTools::GetSessionInterface(UObject* World)
 {
-	auto* OnlineSubsystem = Online::GetSubsystem(GEngine->GetWorldFromContextObject(World, EGetWorldErrorMode::ReturnNull));
+	auto* OnlineSubsystem = Online::GetSubsystem(
+		GEngine->GetWorldFromContextObject(World, EGetWorldErrorMode::ReturnNull));
 	check(OnlineSubsystem);
 	return OnlineSubsystem;
 }
